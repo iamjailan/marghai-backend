@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Customer {
+  id        String   @id @default(dbgenerated("(concat('cus_', gen_random_uuid()))::TEXT"))
+  name      String
+  email     String   @unique
+  password  String
+  jobs      Job[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Job {
+  id          String   @id @default(dbgenerated("(concat('job_', gen_random_uuid()))::TEXT"))
+  title       String
+  company     String
+  location    String
+  type        String
+  salary      String
+  deadline    DateTime
+  postedDate  DateTime
+  description String
+  logo        String
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
