@@ -13,8 +13,6 @@ export class PrismaService
       connectionString: process.env.DATABASE_URL,
     });
 
-    console.log('🔥 RUNTIME DATABASE_URL:', process.env.DATABASE_URL);
-
     super({
       log: ['error', 'warn'],
       adapter: new PrismaPg(pool),

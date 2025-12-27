@@ -4,24 +4,25 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  schemas  = ["marghai"]
 }
 
-model Customer {
-  id         String @id @default(dbgenerated("(concat('cus_', gen_random_uuid()))::TEXT"))
-  first_name String
-  last_name  String
+model customer {
+  id              String   @id @default(dbgenerated("concat('cus_', gen_random_uuid())"))
+  first_name      String
+  last_name       String
+  email           String   @unique
+  profile_picture String?
+  password        String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
+  job             job[]
 
-  email     String   @unique
-  password  String
-  jobs      Job[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("customer")
+  @@schema("marghai")
 }
 
-model Job {
-  id          String   @id @default(dbgenerated("(concat('job_', gen_random_uuid()))::TEXT"))
+model job {
+  id          String   @id @default(dbgenerated("concat('job_', gen_random_uuid())"))
   title       String
   company     String
   location    String
@@ -31,12 +32,10 @@ model Job {
   postedDate  DateTime
   description String
   logo        String
+  customerId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  customer    customer @relation(fields: [customerId], references: [id])
 
-  customerId String
-  customer   Customer @relation(fields: [customerId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("job")
+  @@schema("marghai")
 }

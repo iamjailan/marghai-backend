@@ -1,19 +1,20 @@
 -- CreateTable
 CREATE TABLE "customer" (
-    "id" TEXT NOT NULL DEFAULT (concat('cus_', gen_random_uuid()))::TEXT,
+    "id" TEXT NOT NULL DEFAULT concat('cus_', gen_random_uuid()),
     "first_name" TEXT NOT NULL,
     "last_name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "profile_picture" TEXT,
     "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "customer_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "job" (
-    "id" TEXT NOT NULL DEFAULT (concat('job_', gen_random_uuid()))::TEXT,
+    "id" TEXT NOT NULL DEFAULT concat('job_', gen_random_uuid()),
     "title" TEXT NOT NULL,
     "company" TEXT NOT NULL,
     "location" TEXT NOT NULL,
@@ -25,7 +26,7 @@ CREATE TABLE "job" (
     "logo" TEXT NOT NULL,
     "customerId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "job_pkey" PRIMARY KEY ("id")
 );
