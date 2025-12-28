@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { JobsModule } from './jobs/jobs.module';
 import { ConfigModule } from '@nestjs/config';
@@ -21,6 +21,9 @@ import { PrismaService } from './prisma/prisma.service';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtAuthMiddleware).exclude('auth/*path').forRoutes('*');
+    consumer
+      .apply(JwtAuthMiddleware)
+      .exclude('auth/*path', { path: 'jobs/all', method: RequestMethod.GET })
+      .forRoutes('*');
   }
 }

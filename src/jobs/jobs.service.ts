@@ -38,4 +38,14 @@ export class JobsService {
       throw new HttpException(error.message || 'Could not fetch jobs', 400);
     }
   }
+
+  async getAllJobs() {
+    try {
+      const res = await this.prisma.job.findMany();
+
+      return res;
+    } catch (error) {
+      throw new HttpException(error.message || 'Could not fetch jobs', 400);
+    }
+  }
 }

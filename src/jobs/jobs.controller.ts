@@ -9,12 +9,32 @@ export class JobsController {
   constructor(private jobsService: JobsService) {}
 
   @Post()
-  createJob(@Req() req: any, @Body() body: CreateJobDto) {
-    return this.jobsService.createJob(req.user.userId, body);
+  async createJob(@Req() req: any, @Body() body: CreateJobDto) {
+    const res = await this.jobsService.createJob(req.user.userId, body);
+
+    return {
+      success: true,
+      data: res,
+    };
   }
 
-  @Get('my')
-  getMyJobs(@Req() req: any) {
-    return this.jobsService.getMyJobs(req.user.userId);
+  @Get('me')
+  async getMyJobs(@Req() req: any) {
+    const res = await this.jobsService.getMyJobs(req.user.userId);
+
+    return {
+      success: true,
+      data: res,
+    };
+  }
+
+  @Get('all')
+  async getAllJobs() {
+    const res = await this.jobsService.getAllJobs();
+
+    return {
+      success: true,
+      data: res,
+    };
   }
 }
