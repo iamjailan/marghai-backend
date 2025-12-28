@@ -3,6 +3,8 @@ import { AuthModule } from './auth/auth.module';
 import { JobsModule } from './jobs/jobs.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtAuthMiddleware } from './middleware/main';
+import { MeModule } from './me/me.module';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
@@ -12,12 +14,13 @@ import { JwtAuthMiddleware } from './middleware/main';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    MeModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [PrismaService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtAuthMiddleware).forRoutes('jobs');
+    consumer.apply(JwtAuthMiddleware).exclude('auth/*path').forRoutes('*');
   }
 }
