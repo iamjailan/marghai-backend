@@ -3,11 +3,11 @@ import { IsString, IsNotEmpty, IsDateString } from 'class-validator';
 export class CreateJobDto {
   @IsString()
   @IsNotEmpty()
-  jobTitle: string;
+  title: string;
 
   @IsString()
   @IsNotEmpty()
-  companyName: string;
+  company: string;
 
   @IsString()
   @IsNotEmpty()
@@ -15,7 +15,7 @@ export class CreateJobDto {
 
   @IsString()
   @IsNotEmpty()
-  jobType: string;
+  type: string;
 
   @IsString()
   @IsNotEmpty()

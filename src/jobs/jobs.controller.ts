@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -47,7 +48,14 @@ export class JobsController {
   }
 
   @Get('me')
-  async getMyJobs(@Req() req: any) {
+  async getMyJobs(
+    @Req() req: any,
+    @Query() query: { offset: number; limit: number },
+  ) {
+    const id = req.user.userId;
+    const limit = query.limit ? Number(query.limit) : 10;
+    const offset = query.offset ? Number(query.offset) : 0;
+
     const fields: string[] = [
       'id',
       'createdAt',
@@ -59,17 +67,24 @@ export class JobsController {
       'deadline',
       'description',
     ];
-    const id = req.user.userId;
 
-    const res = await this.jobsService.getMyJobs({ customerId: id, fields });
+    const res = await this.jobsService.getMyJobs({
+      customerId: id,
+      fields,
+      limit,
+      offset,
+    });
 
     return {
       success: true,
-      data: res,
+      data: res.jobs,
+      limit: limit,
+      offset: offset,
+      count: res.count,
     };
   }
 
-  @Get('all')
+  @Get()
   async getAllJobs(@Query() query: { offset: number; limit: number }) {
     const fields: string[] = [
       'id',
@@ -121,6 +136,48 @@ export class JobsController {
       fields,
       customerId,
       data: body,
+      id: id,
+    });
+
+    return {
+      success: true,
+      data: res,
+    };
+  }
+
+  @Get('/:id')
+  async getJobById(@Req() req: any, @Param('id') id: string) {
+    const customerId = req.user.userId;
+    const fields: string[] = [
+      'id',
+      'createdAt',
+      'title',
+      'company',
+      'location',
+      'type',
+      'salary',
+      'deadline',
+      'description',
+    ];
+
+    const res = await this.jobsService.getJobById({
+      fields,
+      customerId,
+      id: id,
+    });
+
+    return {
+      success: true,
+      data: res,
+    };
+  }
+
+  @Delete('/:id')
+  async deleteJobById(@Req() req: any, @Param('id') id: string) {
+    const customerId = req.user.userId;
+
+    const res = await this.jobsService.deleteJobById({
+      customerId,
       id: id,
     });
 
