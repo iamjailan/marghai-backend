@@ -2,7 +2,7 @@ import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { customer } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createPrismaSelect } from 'src/utils/prismaSelect';
-import { UpdateUserDto } from './update-me-dto';
+import { UpdateUserDto } from './dto/update-me-dto';
 
 @Injectable()
 export class MeService {
