@@ -8,11 +8,29 @@ export class AuthController {
 
   @Post('register')
   register(@Body() body: RegisterDto) {
-    return this.authService.register(body);
+    const fields = [
+      'id',
+      'createdAt',
+      'email',
+      'first_name',
+      'last_name',
+      'profile_picture',
+    ];
+
+    return this.authService.register(body, fields);
   }
 
   @Post('login')
   login(@Body() body: LoginDto) {
-    return this.authService.login(body);
+    const fields = [
+      'id',
+      'createdAt',
+      'email',
+      'first_name',
+      'last_name',
+      'profile_picture',
+    ];
+
+    return this.authService.login(body, fields);
   }
 }

@@ -10,7 +10,14 @@ export class MeController {
   async getProfile(@Req() req: any) {
     const customerId = req?.user?.userId;
 
-    const fields = ['id', 'email', 'first_name', 'last_name'];
+    const fields = [
+      'id',
+      'createdAt',
+      'email',
+      'first_name',
+      'last_name',
+      'profile_picture',
+    ];
 
     const res = await this.meService.retrieveById({ customerId, fields });
 
@@ -23,7 +30,14 @@ export class MeController {
   @Put()
   async updateProfile(@Req() req: any, @Body() body: UpdateUserDto) {
     const customerId = req?.user?.userId;
-    const fields = ['id', 'email', 'first_name', 'last_name'];
+    const fields = [
+      'id',
+      'createdAt',
+      'email',
+      'first_name',
+      'last_name',
+      'profile_picture',
+    ];
 
     const res = await this.meService.updateById({
       customerId,

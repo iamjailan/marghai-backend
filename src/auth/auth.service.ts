@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto, RegisterDto } from './dto/login';
+import { createPrismaSelect } from 'src/utils/prismaSelect';
 
 @Injectable()
 export class AuthService {
@@ -11,37 +12,48 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(data: RegisterDto) {
+  async register(data: RegisterDto, fields: string[]) {
     try {
-      const checkCustomer = await this.prisma.customer.findUnique({
+      const checkCustomer: any = await this.prisma.customer.findUnique({
         where: { email: data.email },
+        select: createPrismaSelect(fields),
       });
 
       if (checkCustomer) {
-        return this.signToken(checkCustomer.id, checkCustomer.email);
+        const token = this.signToken(checkCustomer.id, checkCustomer.email);
+        return {
+          token: token,
+          data: checkCustomer,
+        };
       }
 
       const hashedPassword = await bcrypt.hash(data.password, 10);
 
-      const customer = await this.prisma.customer.create({
+      const customer: any = await this.prisma.customer.create({
         data: {
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
           password: hashedPassword,
         },
+        select: createPrismaSelect(fields),
       });
+      const token = this.signToken(customer.id, customer.email);
 
-      return this.signToken(customer.id, customer.email);
+      return {
+        token: token,
+        data: customer,
+      };
     } catch (error) {
       throw new UnauthorizedException(error.message || 'Registration failed');
     }
   }
 
-  async login(data: LoginDto) {
+  async login(data: LoginDto, fields: string[]) {
     try {
-      const customer = await this.prisma.customer.findUnique({
+      const customer: any = await this.prisma.customer.findUnique({
         where: { email: data.email },
+        select: createPrismaSelect(fields),
       });
 
       if (!customer) {
@@ -54,7 +66,9 @@ export class AuthService {
         throw new UnauthorizedException('Invalid credentials');
       }
 
-      return this.signToken(customer.id, customer.email);
+      const token = this.signToken(customer.id, customer.email);
+
+      return { token: token, data: customer };
     } catch (error) {
       throw new UnauthorizedException(error.message || 'Login failed');
     }
