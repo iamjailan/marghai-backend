@@ -70,11 +70,13 @@ export class JobsService {
     limit,
     offset,
     customerId,
+    filter,
   }: {
     fields: string[];
     limit: number;
     offset: number;
     customerId?: string;
+    filter?: string;
   }) {
     const where: Prisma.jobWhereInput = {
       deadline: { gt: new Date() },
@@ -82,6 +84,30 @@ export class JobsService {
 
     if (customerId) {
       where.customerId = customerId;
+    }
+
+    if (filter?.trim()) {
+      const filters = filter.split(',');
+
+      for (const item of filters) {
+        const [key, value] = item.split('=');
+
+        if (!value) continue;
+
+        if (key === 'title') {
+          where.title = {
+            contains: value,
+            mode: 'insensitive',
+          };
+        }
+
+        if (key === 'location') {
+          where.location = {
+            contains: value,
+            mode: 'insensitive',
+          };
+        }
+      }
     }
 
     try {

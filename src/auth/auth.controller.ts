@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/login';
 
-@Controller('auth')
+@Controller('customer/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -29,6 +29,7 @@ export class AuthController {
       'first_name',
       'last_name',
       'profile_picture',
+      'password',
     ];
 
     return this.authService.login(body, fields);

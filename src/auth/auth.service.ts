@@ -68,7 +68,7 @@ export class AuthService {
 
       const token = this.signToken(customer.id, customer.email);
 
-      return { token: token, data: customer };
+      return { token: token, data: { ...customer, password: null } };
     } catch (error) {
       throw new UnauthorizedException(error.message || 'Login failed');
     }

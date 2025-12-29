@@ -8,15 +8,12 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
-import { AuthGuard } from '@nestjs/passport';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDTO } from './dto/update-job';
 
-@Controller('jobs')
-@UseGuards(AuthGuard('jwt'))
+@Controller('customer/jobs')
 export class JobsController {
   constructor(private jobsService: JobsService) {}
 
@@ -32,6 +29,7 @@ export class JobsController {
       'salary',
       'deadline',
       'description',
+      'logo',
     ];
     const id = req.user.userId;
 
@@ -66,6 +64,7 @@ export class JobsController {
       'salary',
       'deadline',
       'description',
+      'logo',
     ];
 
     const res = await this.jobsService.getMyJobs({
@@ -85,7 +84,9 @@ export class JobsController {
   }
 
   @Get()
-  async getAllJobs(@Query() query: { offset: number; limit: number }) {
+  async getAllJobs(
+    @Query() query: { offset: number; limit: number; filter: string },
+  ) {
     const fields: string[] = [
       'id',
       'createdAt',
@@ -98,11 +99,17 @@ export class JobsController {
       'description',
       'customer.id',
       'customer.first_name',
+      'logo',
     ];
     const limit = query.limit ? Number(query.limit) : 10;
     const offset = query.offset ? Number(query.offset) : 0;
 
-    const res = await this.jobsService.getAllJobs({ fields, limit, offset });
+    const res = await this.jobsService.getAllJobs({
+      fields,
+      limit,
+      offset,
+      filter: query.filter,
+    });
 
     return {
       success: true,
@@ -130,6 +137,7 @@ export class JobsController {
       'salary',
       'deadline',
       'description',
+      'logo',
     ];
 
     const res = await this.jobsService.updateJob({
@@ -158,6 +166,7 @@ export class JobsController {
       'salary',
       'deadline',
       'description',
+      'logo',
     ];
 
     const res = await this.jobsService.getJobById({
