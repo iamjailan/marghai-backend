@@ -20,11 +20,7 @@ export class AuthService {
       });
 
       if (checkCustomer) {
-        const token = this.signToken(checkCustomer.id, checkCustomer.email);
-        return {
-          token: token,
-          data: checkCustomer,
-        };
+        throw new UnauthorizedException('Try log in');
       }
 
       const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -35,6 +31,9 @@ export class AuthService {
           last_name: data.last_name,
           email: data.email,
           password: hashedPassword,
+          company: data.company,
+          location: data.location,
+          phone: data.phone,
         },
         select: createPrismaSelect(fields),
       });

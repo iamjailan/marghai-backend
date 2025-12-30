@@ -17,6 +17,9 @@ export class MeController {
       'first_name',
       'last_name',
       'profile_picture',
+      'company',
+      'location',
+      'phone',
     ];
 
     const res = await this.meService.retrieveById({ customerId, fields });
@@ -37,6 +40,9 @@ export class MeController {
       'first_name',
       'last_name',
       'profile_picture',
+      'company',
+      'location',
+      'phone',
     ];
 
     const res = await this.meService.updateById({
