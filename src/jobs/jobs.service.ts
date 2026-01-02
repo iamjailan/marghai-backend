@@ -141,6 +141,7 @@ export class JobsService {
           where,
           skip: offset,
           take: limit,
+          orderBy: { createdAt: 'desc' },
         }),
         this.prisma.job.count({
           where,
