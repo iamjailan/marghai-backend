@@ -2,12 +2,36 @@ import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDTO } from './dto/update-job';
+import { CreateJobApplicationDto } from './dto/create-job-application.dto';
 import { createPrismaSelect } from 'src/utils/prismaSelect';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class JobsService {
   constructor(private prisma: PrismaService) {}
+
+  private async findJobById({
+    id,
+    customerId,
+    select,
+  }: {
+    id: string;
+    customerId?: string;
+    select?: Prisma.jobSelect;
+  }) {
+    const where: Prisma.jobWhereUniqueInput = {
+      id: id,
+    };
+
+    if (customerId) {
+      where.customerId = customerId;
+    }
+
+    return await this.prisma.job.findUnique({
+      where,
+      select,
+    });
+  }
 
   async createJob({
     customerId,
@@ -142,16 +166,9 @@ export class JobsService {
     fields: string[];
   }) {
     try {
-      const where: Prisma.jobWhereUniqueInput = {
-        id: id,
-      };
-
-      if (customerId) {
-        where.customerId = customerId;
-      }
-
-      const res = await this.prisma.job.findUnique({
-        where: where,
+      const res = await this.findJobById({
+        id,
+        customerId,
         select: createPrismaSelect(fields),
       });
 
@@ -159,7 +176,13 @@ export class JobsService {
         throw new NotFoundException(`job not found with id ${id}`);
       }
 
-      return res;
+      // Get application count
+      const applicationCount = await this.getJobApplicationCount(id);
+
+      return {
+        ...res,
+        applicationCount,
+      };
     } catch (error) {
       throw new HttpException(
         error.message || 'Could not fetch jobs',
@@ -222,6 +245,112 @@ export class JobsService {
         error.message || 'Could not fetch jobs',
         error.status || 400,
       );
+    }
+  }
+
+  async createJobApplication({
+    jobId,
+    data,
+    fields,
+  }: {
+    jobId: string;
+    data: CreateJobApplicationDto;
+    fields: string[];
+  }) {
+    try {
+      const job = await this.findJobById({
+        id: jobId,
+      });
+
+      if (!job) {
+        throw new NotFoundException(`Job not found with id ${jobId}`);
+      }
+
+      if (new Date(job.deadline) < new Date()) {
+        throw new HttpException('Job application deadline has passed', 400);
+      }
+
+      const res = await this.prisma.jobApplication.create({
+        data: {
+          jobId,
+          fullName: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          resume: data.resume,
+          coverLetter: data.coverLetter,
+        },
+        select: createPrismaSelect(fields),
+      });
+
+      return res;
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Could not create job application';
+      const status = error instanceof HttpException ? error.getStatus() : 400;
+      throw new HttpException(message, status);
+    }
+  }
+
+  async getJobApplicants({
+    jobId,
+    customerId,
+    fields,
+    limit,
+    offset,
+  }: {
+    jobId: string;
+    customerId: string;
+    fields: string[];
+    limit: number;
+    offset: number;
+  }) {
+    try {
+      const job = await this.findJobById({
+        id: jobId,
+        customerId,
+        select: { customerId: true },
+      });
+
+      if (!job) {
+        throw new NotFoundException(`Job not found with id ${jobId}`);
+      }
+
+      const [applications, count] = await this.prisma.$transaction([
+        this.prisma.jobApplication.findMany({
+          where: { jobId },
+          select: createPrismaSelect(fields),
+          skip: offset,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+        this.prisma.jobApplication.count({
+          where: { jobId },
+        }),
+      ]);
+
+      return { applications, count };
+    } catch (error: unknown) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Could not fetch job applicants';
+      throw new HttpException(message, 400);
+    }
+  }
+
+  async getJobApplicationCount(jobId: string): Promise<number> {
+    try {
+      const count = await this.prisma.jobApplication.count({
+        where: { jobId },
+      });
+      return count;
+    } catch {
+      return 0;
     }
   }
 }

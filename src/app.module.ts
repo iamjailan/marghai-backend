@@ -23,10 +23,21 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(JwtAuthMiddleware)
-      .exclude('customer/auth/*path', {
-        path: 'customer/jobs',
-        method: RequestMethod.GET,
-      })
+      .exclude(
+        'customer/auth/*path',
+        {
+          path: 'customer/jobs',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'customer/jobs/id/*id',
+          method: RequestMethod.GET,
+        },
+        {
+          path: 'customer/jobs/id/*id/apply',
+          method: RequestMethod.POST,
+        },
+      )
       .forRoutes('*');
   }
 }

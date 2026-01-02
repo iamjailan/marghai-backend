@@ -12,6 +12,7 @@ import {
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDTO } from './dto/update-job';
+import { CreateJobApplicationDto } from './dto/create-job-application.dto';
 
 @Controller('customer/jobs')
 export class JobsController {
@@ -153,9 +154,8 @@ export class JobsController {
     };
   }
 
-  @Get('/:id')
+  @Get('/id/:id')
   async getJobById(@Req() req: any, @Param('id') id: string) {
-    const customerId = req.user.userId;
     const fields: string[] = [
       'id',
       'createdAt',
@@ -171,7 +171,6 @@ export class JobsController {
 
     const res = await this.jobsService.getJobById({
       fields,
-      customerId,
       id: id,
     });
 
@@ -181,7 +180,7 @@ export class JobsController {
     };
   }
 
-  @Delete('/:id')
+  @Delete('/id/:id')
   async deleteJobById(@Req() req: any, @Param('id') id: string) {
     const customerId = req.user.userId;
 
@@ -193,6 +192,71 @@ export class JobsController {
     return {
       success: true,
       data: res,
+    };
+  }
+
+  @Post('/id/:id/apply')
+  async applyToJob(
+    @Param('id') jobId: string,
+    @Body() body: CreateJobApplicationDto,
+  ) {
+    const fields: string[] = [
+      'id',
+      'fullName',
+      'email',
+      'phone',
+      'resume',
+      'coverLetter',
+      'createdAt',
+    ];
+
+    const res = await this.jobsService.createJobApplication({
+      jobId,
+      data: body,
+      fields,
+    });
+
+    return {
+      success: true,
+      data: res,
+      message: 'Application submitted successfully',
+    };
+  }
+
+  @Get('/id/:id/applicants')
+  async getJobApplicants(
+    @Req() req: any,
+    @Param('id') jobId: string,
+    @Query() query: { offset: number; limit: number },
+  ) {
+    const customerId = req.user.userId;
+    const limit = query.limit ? Number(query.limit) : 10;
+    const offset = query.offset ? Number(query.offset) : 0;
+
+    const fields: string[] = [
+      'id',
+      'fullName',
+      'email',
+      'phone',
+      'resume',
+      'coverLetter',
+      'createdAt',
+    ];
+
+    const res = await this.jobsService.getJobApplicants({
+      jobId,
+      customerId,
+      fields,
+      limit,
+      offset,
+    });
+
+    return {
+      success: true,
+      data: res.applications,
+      limit: limit,
+      offset: offset,
+      count: res.count,
     };
   }
 }
