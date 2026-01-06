@@ -360,7 +360,7 @@ export class JobsService {
       const [totalCustomers, totalJobs, totalApplicants] =
         await this.prisma.$transaction([
           this.prisma.customer.count(),
-          this.prisma.job.count(),
+          this.prisma.job.count({ where: { deadline: { gt: new Date() } } }),
           this.prisma.jobApplication.count(),
         ]);
 
