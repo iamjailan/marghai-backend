@@ -259,4 +259,14 @@ export class JobsController {
       count: res.count,
     };
   }
+
+  @Get('/statistics')
+  async getStatistics() {
+    const res = await this.jobsService.getStatistics();
+
+    return {
+      success: true,
+      data: res,
+    };
+  }
 }

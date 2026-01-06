@@ -37,6 +37,10 @@ export class AppModule {
           path: 'customer/jobs/id/*id/apply',
           method: RequestMethod.POST,
         },
+        {
+          path: 'customer/jobs/statistics',
+          method: RequestMethod.GET,
+        },
       )
       .forRoutes('*');
   }

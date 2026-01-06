@@ -354,4 +354,26 @@ export class JobsService {
       return 0;
     }
   }
+
+  async getStatistics() {
+    try {
+      const [totalCustomers, totalJobs, totalApplicants] =
+        await this.prisma.$transaction([
+          this.prisma.customer.count(),
+          this.prisma.job.count(),
+          this.prisma.jobApplication.count(),
+        ]);
+
+      return {
+        totalCustomers,
+        totalJobs,
+        totalApplicants,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Could not fetch statistics',
+        error.status || 400,
+      );
+    }
+  }
 }
