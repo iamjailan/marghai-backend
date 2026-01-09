@@ -145,6 +145,8 @@ export class JobsService {
         }),
         this.prisma.job.count({
           where,
+          skip: offset,
+          take: limit,
         }),
       ]);
 
