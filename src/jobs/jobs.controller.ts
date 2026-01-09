@@ -102,8 +102,14 @@ export class JobsController {
       'customer.first_name',
       'logo',
     ];
-    const limit = query.limit ? Number(query.limit) : 10;
-    const offset = query.offset ? Number(query.offset) : 0;
+
+    const limit = Number.isFinite(Number(query.limit))
+      ? Number(query.limit)
+      : 10;
+
+    const offset = Number.isFinite(Number(query.offset))
+      ? Number(query.offset)
+      : 0;
 
     const res = await this.jobsService.getAllJobs({
       fields,
