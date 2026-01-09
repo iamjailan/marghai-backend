@@ -204,7 +204,11 @@ export class JobsService {
     fields: string[];
   }) {
     try {
-      await this.getJobById({ customerId, id, fields: ['id'] });
+      const job = await this.getJobById({
+        customerId,
+        id,
+        fields: ['id', 'company'],
+      });
 
       const res = await this.prisma.job.update({
         where: { id: id },
@@ -214,10 +218,9 @@ export class JobsService {
           location: data.location,
           type: data.type,
           salary: data.salary,
-          deadline: new Date(data.deadline),
-          postedDate: new Date(),
+          deadline: data.deadline ? new Date(data.deadline) : undefined,
           description: data.description,
-          logo: data.company.substring(0, 2).toUpperCase(),
+          logo: job.company?.substring(0, 2)?.toUpperCase(),
           customerId,
         },
         select: createPrismaSelect(fields),
