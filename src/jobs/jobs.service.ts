@@ -135,11 +135,13 @@ export class JobsService {
     }
 
     try {
+      const skip = offset * limit;
+
       const [jobs, count] = await this.prisma.$transaction([
         this.prisma.job.findMany({
           select: createPrismaSelect(fields),
           where,
-          skip: offset,
+          skip,
           take: limit,
           orderBy: { createdAt: 'desc' },
         }),
