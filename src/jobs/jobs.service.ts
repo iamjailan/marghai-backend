@@ -360,6 +360,53 @@ export class JobsService {
     }
   }
 
+  async getCustomerApplicants({
+    customerId,
+    jobId,
+    fields,
+    limit,
+    offset,
+  }: {
+    customerId: string;
+    jobId?: string;
+    fields: string[];
+    limit: number;
+    offset: number;
+  }) {
+    try {
+      const where: Prisma.jobApplicationWhereInput = {
+        job: {
+          customerId,
+        },
+      };
+
+      if (jobId) {
+        where.jobId = jobId;
+      }
+
+      const [applications, count] = await this.prisma.$transaction([
+        this.prisma.jobApplication.findMany({
+          where,
+          select: createPrismaSelect(fields),
+          skip: offset,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+        this.prisma.jobApplication.count({
+          where,
+        }),
+      ]);
+
+      return { applications, count };
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Could not fetch customer applicants';
+      throw new HttpException(message, 400);
+    }
+  }
+
   async getStatistics() {
     try {
       const [totalCustomers, totalJobs, totalApplicants] =

@@ -266,6 +266,81 @@ export class JobsController {
     };
   }
 
+  @Get('/applicants')
+  async getCustomerApplicants(
+    @Req() req: any,
+    @Query() query: { offset: number; limit: number },
+  ) {
+    const customerId = req.user.userId;
+    const limit = query.limit ? Number(query.limit) : 10;
+    const offset = query.offset ? Number(query.offset) : 0;
+
+    const fields: string[] = [
+      'id',
+      'fullName',
+      'email',
+      'phone',
+      'resume',
+      'coverLetter',
+      'createdAt',
+      'job.id',
+      'job.title',
+      'job.company',
+    ];
+
+    const res = await this.jobsService.getCustomerApplicants({
+      customerId,
+      fields,
+      limit,
+      offset,
+    });
+
+    return {
+      success: true,
+      data: res.applications,
+      limit: limit,
+      offset: offset,
+      count: res.count,
+    };
+  }
+
+  @Get('/id/:id/applicants')
+  async getJobApplicantsByJobId(
+    @Req() req: any,
+    @Param('id') jobId: string,
+    @Query() query: { offset: number; limit: number },
+  ) {
+    const customerId = req.user.userId;
+    const limit = query.limit ? Number(query.limit) : 10;
+    const offset = query.offset ? Number(query.offset) : 0;
+
+    const fields: string[] = [
+      'id',
+      'fullName',
+      'email',
+      'phone',
+      'resume',
+      'coverLetter',
+      'createdAt',
+    ];
+
+    const res = await this.jobsService.getCustomerApplicants({
+      jobId,
+      customerId,
+      fields,
+      limit,
+      offset,
+    });
+
+    return {
+      success: true,
+      data: res.applications,
+      limit: limit,
+      offset: offset,
+      count: res.count,
+    };
+  }
+
   @Get('/statistics')
   async getStatistics() {
     const res = await this.jobsService.getStatistics();
