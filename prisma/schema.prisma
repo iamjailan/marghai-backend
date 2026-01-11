@@ -9,8 +9,6 @@ datasource db {
 
 model customer {
   id              String   @id @default(dbgenerated("concat('cus_', gen_random_uuid())"))
-  first_name      String
-  last_name       String
   email           String   @unique
   profile_picture String?
   password        String
@@ -29,10 +27,8 @@ model job {
   title        String
   company      String
   location     String
-  type         String
   salary       String
   deadline     DateTime
-  postedDate   DateTime
   description  String
   logo         String
   customerId   String
