@@ -228,7 +228,7 @@ export class JobsController {
     @Param('id') jobId: string,
     @Query() query: { offset: number; limit: number },
   ) {
-    const customerId = req.user.userId;
+    const customerId = req?.user?.userId;
     const limit = query.limit ? Number(query.limit) : 10;
     const offset = query.offset ? Number(query.offset) : 0;
 
