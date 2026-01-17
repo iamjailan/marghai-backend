@@ -1,0 +1,14 @@
+model jobApplication {
+    id          String   @id @default(dbgenerated("concat('app_', gen_random_uuid())"))
+    jobId       String
+    fullName    String
+    email       String
+    phone       String?
+    resume      String?
+    coverLetter String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @default(now())
+    job         job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+    @@schema("marghai")
+}

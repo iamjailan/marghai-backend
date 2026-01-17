@@ -1,0 +1,17 @@
+model customer {
+    id              String    @id @default(dbgenerated("concat('cus_', gen_random_uuid())"))
+    email           String    @unique
+    profile_picture String?
+    password        String
+    location        String?
+    company         String?
+    phone           String?
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @default(now())
+    is_disabled     Boolean   @default(false)
+    disabled_at     DateTime?
+    metadata        Json?
+    job             job[]
+
+    @@schema("marghai")
+}

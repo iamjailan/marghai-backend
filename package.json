@@ -19,9 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:apply": "prisma migrate deploy",
-    "deploy": "prisma migrate deploy && prisma generate",
+    "deploy": "prisma migrate deploy && prisma generate --schema=prisma/schema",
     "migration:status": "npx prisma migrate status",
-    "migration:create": "npx prisma migrate dev --name"
+    "migration:create": "npx prisma migrate dev --schema=prisma/schema --name"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
