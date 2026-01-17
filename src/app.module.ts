@@ -13,7 +13,7 @@ import { PrismaService } from './prisma/prisma.service';
     ThrottlerModule.forRoot({
       throttlers: [
         {
-          limit: 1,
+          limit: 15,
           ttl: 60000,
         },
       ],
