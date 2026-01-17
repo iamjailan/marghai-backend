@@ -1,4 +1,6 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
 import { JobsModule } from './jobs/jobs.module';
 import { ConfigModule } from '@nestjs/config';
@@ -8,6 +10,14 @@ import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          limit: 1,
+          ttl: 60000,
+        },
+      ],
+    }),
     AuthModule,
     JobsModule,
     ConfigModule.forRoot({
@@ -17,7 +27,13 @@ import { PrismaService } from './prisma/prisma.service';
     MeModule,
   ],
   controllers: [],
-  providers: [PrismaService],
+  providers: [
+    PrismaService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
